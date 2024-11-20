@@ -14,7 +14,8 @@
     <div class="uploadSection">
     <div class="uploadLeft">
     <h1>Resume Analyzer</h1>
-    <h3>Evaluates resumes based on specific criteria and assigns a score to each resume.</h3>
+    <h3>Evaluates resumes based on specific criteria<br>
+        and assigns a score to each resume.</h3>
     <div class="uploadContainer">
         <div class="uploadBox">
             <p class="uploadText">Upload PDF files only.<br>
@@ -33,9 +34,10 @@
     <img src="./images/candidate-analysis.png" alt="Analyzing Resume Illustration">
     </div>
    </div>
-    <h2>Analysis Results:</h2>
+   
+   <div class="resultSection">
     <div id="results"></div>
-
+    </div>
     <script>
 
 //   For form
@@ -190,15 +192,30 @@
                             // Display results for this file
                             const fileResults = document.createElement('div');
                             fileResults.innerHTML = `
-                                <h3>Resume ${index + 1}: ${file.name}</h3>
-                                <p><strong>Length of Resume:</strong> ${totalWordCount} words (Score: ${lengthScore}/5)</p>
-                                <p><strong>Keywords Found:</strong> ${matchedKeywords.join(', ')} (Score: ${keywordScore}/10)</p>
-                                <p><strong>Education:</strong> ${hasEducation ? educationMatch : "No Degree Found"} (Score: ${educationScore}/5)</p>
-                                <p><strong>Experience:</strong> ${hasExperience ? experienceDetails.join(', ') : "No Relevant Experience"} (Score: ${experienceScore}/5)</p>
-                                <p><strong>Total Score:</strong> ${totalScore}/25</p>
-                                <hr>
-                            `;
-                            resultsDiv.appendChild(fileResults);
+                            <div class="resultsHeader">
+                            <h2>Analysis Results</h2>
+                            <h3>Resume ${index + 1}: ${file.name}</h3>
+                            </div>
+                            <div class="resultsContainer">
+                                <div id="resumeLength">
+                                    <p><strong>Length of Resume</strong> <br>${totalWordCount} words (Score: ${lengthScore}/5)</p>
+                                </div>
+                                <div id="keywordsFound">
+                                    <p><strong>Keywords Found</strong> <br>${matchedKeywords.join(', ')} (Score: ${keywordScore}/10)</p>
+                                </div>
+                                <div id="education">
+                                    <p><strong>Education</strong> <br>${hasEducation ? educationMatch : "No Degree Found"} (Score: ${educationScore}/5)</p>
+                                </div>
+                                <div id="experience">
+                                    <p><strong>Experience</strong> <br> ${hasExperience ? experienceDetails.join(', ') : "No Relevant Experience"} (Score: ${experienceScore}/5)</p>
+                                </div>
+                                <div id="totalScore">
+                                    <p><strong>Total Score</strong> <br> ${totalScore}</p>
+                                </div>
+                            </div> 
+                            <hr>
+                        `;
+                        resultsDiv.appendChild(fileResults);
                         });
                     });
                 };

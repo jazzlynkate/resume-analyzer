@@ -9,7 +9,7 @@
     display: flex;
     flex-direction: row;
     justify-content: space-around;
-    margin: 100px;
+    margin: 100px 150px 0 150px;
   }
 
  .uploadSection h3 {
@@ -21,22 +21,21 @@ display: flex;
 flex-direction: column;
   }
 
-  .uploadSection img {
+  .uploadRight img {
     width: 100%; 
     max-width: 510px; 
     height: auto; 
     display: block; 
     margin: 0 left; 
+    margin-top: 70px;
 }
 
-/* For smaller screens, you can adjust max-width */
 @media (max-width: 768px) {
     .uploadSection img {
         max-width: 400px; /* Adjust max-width for tablets */
     }
 }
 
-/* For mobile screens, further adjust max-width if needed */
 @media (max-width: 480px) {
     .uploadSection img {
         max-width: 300px; /* Adjust max-width for mobile */
@@ -101,7 +100,6 @@ flex-direction: column;
     color: #666;
 }
 
-/* Button style */
 button {
     background-color: #4CA2D9;
     color: white;
@@ -113,7 +111,60 @@ button {
     transition: background-color 0.3s;
 }
 
-/* Button hover effect */
 button:hover {
-    background-color: #3d92b8;
+    background-color: #3c8baf;
+}
+
+
+/* Analysis Result Section */
+
+.resultSection {
+    background-color: rgb(223, 240, 255);
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    box-shadow: 0 -6px 7px rgba(89, 89, 89, 0.1);
+}
+
+.resultsContainer {
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+#resumeLength,
+#keywordsFound,
+#education,
+#experience,
+#totalScore {
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 10px;
+  width: 50%;
+  max-width: 300px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin: 0;
+}
+
+.resultsContainer #resumeLength {
+    background-color: #e3f2fd; 
+}
+
+.resultsContainer #keywordsFound {
+    background-color: #ffebee; 
+}
+
+.resultsContainer #education {
+    background-color: #e8f5e9; 
+}
+
+.resultsContainer #experience {
+    background-color: #fff3e0; 
+}
+
+.resultsContainer #totalScore {
+    background-color: #ede7f6; 
+    font-weight: bold;
 }
