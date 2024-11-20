@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Analyzer</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+</head>
+<body>
+    <div class="uploadSection">
+    <div class="uploadLeft">
+    <h1>Resume Analyzer</h1>
+    <h3>Evaluates resumes based on specific criteria and assigns a score to each resume.</h3>
+    <div class="uploadContainer">
+        <div class="uploadBox">
+            <p class="uploadText">Upload PDF files only.<br>
+            You may upload up to 5 files.</p>
+            <form id="form">
+                <label for="files" class="fileLabel">Choose File</label>
+                <span id="fileName">No file chosen</span>
+                <input id="files" type="file" accept=".pdf" multiple>
+                <button type="submit">Analyze Resume</button>
+            </form>
+        </div>
+    </div>
+    </form>
+    </div>
+    <div class="uploadRight">
+    <img src="./images/candidate-analysis.png" alt="Analyzing Resume Illustration">
+    </div>
+   </div>
+    <h2>Analysis Results:</h2>
+    <div id="results"></div>
+
+    <script>
+
+//   For form
+            const filesInput = document.getElementById('files');
+            const fileNameDisplay = document.getElementById('fileName');
+
+            filesInput.addEventListener('change', () => {
+                const fileList = Array.from(filesInput.files)
+                    .map(file => file.name)
+                    .join(', ');
+                fileNameDisplay.textContent = fileList || 'No file chosen';
+            });
+
+                    document.getElementById('form').addEventListener('submit', function (e) {
+                        e.preventDefault();
+
+                        const fileInput = document.getElementById('files');
+                        const files = fileInput.files;
+
+                        if (!files.length) {
+                            alert('Please upload at least one resume.');
+                            return;
+                        }
+
+                        if (files.length > 5) {
+                            alert('You can only upload up to 5 resumes at once.');
+                            return;
+                        }
+//
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = ''; // Clear previous results
+
+            const criteria = {
+                keywords: [
+                    "manage", "manages", "managing", "managed", "manager",
+                    "graphic design", "design", "visual",
+                    "mentor", "mentored", "mentors", "mentoring",
+                    "supervisor", "supervised", "supervising", "supervises",
+                    "market share", "marketing", "marketer", "market research"
+                ],
+                educationKeywords: ["bachelor's", "master's", "masters", "bachelor", "doctoral", "phd"]
+            };
+
+            Array.from(files).forEach((file, index) => {
+                const fileReader = new FileReader();
+
+                fileReader.onload = function () {
+                    const typedArray = new Uint8Array(fileReader.result);
+
+                    pdfjsLib.getDocument(typedArray).promise.then(function (pdf) {
+                        let text = '';
+
+                        const pagePromises = [];
+                        for (let i = 1; i <= pdf.numPages; i++) {
+                            pagePromises.push(
+                                pdf.getPage(i).then(function (page) {
+                                    return page.getTextContent().then(function (textContent) {
+                                        textContent.items.forEach((item) => {
+                                            text += item.str + ' ';
+                                        });
+                                    });
+                                })
+                            );
+                        }
+
+                        Promise.all(pagePromises).then(() => {
+                            // Maintain original capitalization
+                            const originalText = text;
+
+                            // Convert text to lowercase for case-insensitive comparison
+                            text = text.toLowerCase();
+
+                            let totalScore = 0;
+
+                            // 2. Length of the Resume
+                            const totalWordCount = text.split(/\s+/).filter(word => word.trim() !== '').length;
+                            const lengthScore = Math.min(5, Math.floor(totalWordCount / 100)); // Max 5 points
+                            totalScore += lengthScore;
+
+                            // 3. Keyword Scoring
+                            let keywordCount = 0;
+                            let matchedKeywords = [];
+                            criteria.keywords.forEach(keyword => {
+                                if (text.includes(keyword)) {
+                                    keywordCount++;
+                                    matchedKeywords.push(keyword);
+                                }
+                            });
+                            const keywordScore = Math.min(10, keywordCount * 2); // Max 10 points
+                            totalScore += keywordScore;
+
+                            // 4. Education Scoring
+                            const educationMatch = criteria.educationKeywords.find(degree => text.includes(degree));
+                            const hasEducation = Boolean(educationMatch);
+                            const educationScore = hasEducation ? 5 : 0;
+                            totalScore += educationScore;
+
+                           // 5. Experience Scoring
+                            const monthYearRegex = /(?:January|February|March|April|May|June|July|August|September|October|November|December)\s(\d{4})\s(?:-|to)\s(?:January|February|March|April|May|June|July|August|September|October|November|December)\s(\d{4})/gi;
+                            const yearRangeRegex = /(\d{4})\s*(?:-|to)\s*(\d{4})/gi;
+                            const yearMentionRegex = /\b(\d+)\s+years\b/gi;
+                            const roleRegex = /(?:\n|\r|\s)?(.*?)(?:\s(?:since|until|\d{4}|\d{2}-\d{2}|to))?/i;  // Matches job title
+
+                            const dateMatches = [...originalText.matchAll(monthYearRegex)];
+                            const yearRangeMatches = [...originalText.matchAll(yearRangeRegex)];
+                            const yearMentions = [...text.matchAll(yearMentionRegex)];
+
+                            let hasExperience = false;
+                            let experienceDetails = [];
+
+                            // Parse month-year ranges
+                            dateMatches.forEach(match => {
+                                const startYear = parseInt(match[1]);
+                                const endYear = parseInt(match[2]);
+                                const experienceYears = endYear - startYear;
+
+                                if (experienceYears >= 2) {
+                                    hasExperience = true;
+                                    const roleMatch = originalText.substring(0, match.index).match(roleRegex);
+                                    const role = roleMatch ? roleMatch[1].trim() : "Role Unknown";
+                                    experienceDetails.push(`${experienceYears} years (${role}, ${match[0]})`);
+                                }
+                            });
+
+                            // Parse year-only ranges
+                            yearRangeMatches.forEach(match => {
+                                const startYear = parseInt(match[1]);
+                                const endYear = parseInt(match[2]);
+                                const experienceYears = endYear - startYear;
+
+                                if (experienceYears >= 2) {
+                                    hasExperience = true;
+                                    const roleMatch = originalText.substring(0, match.index).match(roleRegex);
+                                    const role = roleMatch ? roleMatch[1].trim() : "Role Unknown";
+                                    // Remove comma before the year if no month is included
+                                    experienceDetails.push(`${experienceYears} years (${role} ${match[0]})`);
+                                }
+                            });
+
+                            // Parse year mentions
+                            yearMentions.forEach(match => {
+                                const years = parseInt(match[1]);
+                                if (years >= 2) {
+                                    hasExperience = true;
+                                    experienceDetails.push(`${years} years mentioned`);
+                                }
+                            });
+
+                            const experienceScore = hasExperience ? 5 : 0;
+                            totalScore += experienceScore;
+
+                            // Display results for this file
+                            const fileResults = document.createElement('div');
+                            fileResults.innerHTML = `
+                                <h3>Resume ${index + 1}: ${file.name}</h3>
+                                <p><strong>Length of Resume:</strong> ${totalWordCount} words (Score: ${lengthScore}/5)</p>
+                                <p><strong>Keywords Found:</strong> ${matchedKeywords.join(', ')} (Score: ${keywordScore}/10)</p>
+                                <p><strong>Education:</strong> ${hasEducation ? educationMatch : "No Degree Found"} (Score: ${educationScore}/5)</p>
+                                <p><strong>Experience:</strong> ${hasExperience ? experienceDetails.join(', ') : "No Relevant Experience"} (Score: ${experienceScore}/5)</p>
+                                <p><strong>Total Score:</strong> ${totalScore}/25</p>
+                                <hr>
+                            `;
+                            resultsDiv.appendChild(fileResults);
+                        });
+                    });
+                };
+
+                fileReader.readAsArrayBuffer(file);
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,119 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  .uploadSection {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    margin: 100px;
+  }
+
+ .uploadSection h3 {
+    font-weight: 300;
+  }
+
+  .uploadLeft {
+display: flex;
+flex-direction: column;
+  }
+
+  .uploadSection img {
+    width: 100%; 
+    max-width: 510px; 
+    height: auto; 
+    display: block; 
+    margin: 0 left; 
+}
+
+/* For smaller screens, you can adjust max-width */
+@media (max-width: 768px) {
+    .uploadSection img {
+        max-width: 400px; /* Adjust max-width for tablets */
+    }
+}
+
+/* For mobile screens, further adjust max-width if needed */
+@media (max-width: 480px) {
+    .uploadSection img {
+        max-width: 300px; /* Adjust max-width for mobile */
+    }
+}
+ /* Upload Form */
+
+ /* Container to center the upload box */
+.uploadContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 50vh;
+}
+
+/* Style for the upload box */
+.uploadBox {
+    background-color: white;
+    border-radius: 10px;
+    padding: 30px;
+    width: 80%;
+    max-width: 500px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+/* Text inside the upload box */
+.uploadText {
+    font-size: 16px;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+/* Hidden file input */
+#files {
+    display: none;
+}
+
+/* Label styled as a button */
+.fileLabel {
+    display: inline-block;
+    padding: 12px 30px;
+    background-color: #f0f0f0;
+    border: 2px dashed #bbb;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-bottom: 10px;
+    transition: background-color 0.3s;
+}
+
+/* File label hover effect */
+.fileLabel:hover {
+    background-color: #e0e0e0;
+}
+
+/* Display selected file name */
+#fileName {
+    display: block;
+    margin: 10px 0;
+    font-size: 14px;
+    color: #666;
+}
+
+/* Button style */
+button {
+    background-color: #4CA2D9;
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+/* Button hover effect */
+button:hover {
+    background-color: #3d92b8;
+}
