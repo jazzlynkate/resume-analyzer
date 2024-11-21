@@ -15,6 +15,7 @@
 
 .uploadSection h3 {
     font-weight: 300;
+    font-size: 24px;
 }
 
 .uploadLeft, .uploadRight {
@@ -27,7 +28,7 @@
 
 .uploadRight img {
     width: 100%; 
-    max-width: 510px; 
+    max-width: 600px; 
     height: auto; 
     display: block; 
     margin: 0 auto;
@@ -63,7 +64,6 @@
 /* Upload Form */
 .uploadContainer {
     display: flex;
-    justify-content: center;
     align-items: center;
     height: 50vh;
 }
