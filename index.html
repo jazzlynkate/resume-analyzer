@@ -14,8 +14,7 @@
     <div class="uploadSection">
     <div class="uploadLeft">
     <h1>Resume Analyzer</h1>
-    <h3>Evaluates resumes based on specific criteria<br>
-        and assigns a score to each resume.</h3>
+    <h3>Evaluates resumes based on specific criteria and assigns a score to each resume.</h3>
     <div class="uploadContainer">
         <div class="uploadBox">
             <p class="uploadText">Upload PDF files only.<br>
@@ -198,19 +197,29 @@
                             </div>
                             <div class="resultsContainer">
                                 <div id="resumeLength">
-                                    <p><strong>Length of Resume</strong> <br>${totalWordCount} words (Score: ${lengthScore}/5)</p>
+                                    <p><strong>Length of Resume</strong> <br>${totalWordCount} words</p>
+
+                                    <div class="scoring">Score: ${lengthScore}/5</div>
                                 </div>
                                 <div id="keywordsFound">
-                                    <p><strong>Keywords Found</strong> <br>${matchedKeywords.join(', ')} (Score: ${keywordScore}/10)</p>
+                                    <p><strong>Keywords Found</strong> <br>${matchedKeywords.join(', ')}</p>
+
+                                    <div class="scoring">Score: ${keywordScore}/10</div>
                                 </div>
                                 <div id="education">
-                                    <p><strong>Education</strong> <br>${hasEducation ? educationMatch : "No Degree Found"} (Score: ${educationScore}/5)</p>
+                                    <p><strong>Education</strong> <br>${hasEducation ? educationMatch : "No Degree Found"}</p>
+
+                                    <div class="scoring">Score: ${educationScore}/5</div>
                                 </div>
                                 <div id="experience">
-                                    <p><strong>Experience</strong> <br> ${hasExperience ? experienceDetails.join(', ') : "No Relevant Experience"} (Score: ${experienceScore}/5)</p>
+                                    <p><strong>Experience</strong> <br> ${hasExperience ? experienceDetails.join(', ') : "No Relevant Experience"}</p>
+
+                                    <div class="scoring">Score: ${experienceScore}/5</div>
                                 </div>
                                 <div id="totalScore">
-                                    <p><strong>Total Score</strong> <br> ${totalScore}</p>
+                                    <p><strong>Total Score</strong></p>
+
+                                    <div class="scoringTotal">${totalScore}</div>
                                 </div>
                             </div> 
                             <hr>
