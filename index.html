@@ -129,10 +129,9 @@
                             totalScore += keywordScore;
 
                             // Education Scoring
-                            const educationMatch = criteria.educationKeywords.find(degree => text.includes(degree));
-                            const hasEducation = Boolean(educationMatch);
+                            const educationMatches = criteria.educationKeywords.filter(degree => text.includes(degree));
+                            const hasEducation = educationMatches.length > 0;
                             const educationScore = hasEducation ? 5 : 0;
-                            totalScore += educationScore;
 
                            // Experience Scoring
                             const monthYearRegex = /(?:January|February|March|April|May|June|July|August|September|October|November|December)\s(\d{4})\s(?:-|to)\s(?:January|February|March|April|May|June|July|August|September|October|November|December)\s(\d{4})/gi;
@@ -190,40 +189,36 @@
 
                             // Display results for this file
                             const fileResults = document.createElement('div');
+                            const educationDisplay = hasEducation ? educationMatches.join(', ') : "No Degree Found";
                             fileResults.innerHTML = `
-                            <div class="resultsHeader">
-                            <h2>Analysis Results</h2>
-                            <h3>Resume ${index + 1}: ${file.name}</h3>
-                            </div>
-                            <div class="resultsContainer">
-                                <div id="resumeLength">
-                                    <p><strong>Length of Resume</strong> <br>${totalWordCount} words</p>
-
-                                    <div class="scoring">Score: ${lengthScore}/5</div>
+                                <div class="resultsHeader">
+                                    <h2>Analysis Results</h2>
+                                    <h3>Resume ${index + 1}: ${file.name}</h3>
                                 </div>
-                                <div id="keywordsFound">
-                                    <p><strong>Keywords Found</strong> <br>${matchedKeywords.join(', ')}</p>
-
-                                    <div class="scoring">Score: ${keywordScore}/10</div>
-                                </div>
-                                <div id="education">
-                                    <p><strong>Education</strong> <br>${hasEducation ? educationMatch : "No Degree Found"}</p>
-
-                                    <div class="scoring">Score: ${educationScore}/5</div>
-                                </div>
-                                <div id="experience">
-                                    <p><strong>Experience</strong> <br> ${hasExperience ? experienceDetails.join(', ') : "No Relevant Experience"}</p>
-
-                                    <div class="scoring">Score: ${experienceScore}/5</div>
-                                </div>
-                                <div id="totalScore">
-                                    <p><strong>Total Score</strong></p>
-
-                                    <div class="scoringTotal">${totalScore}</div>
-                                </div>
-                            </div> 
-                            <hr>
-                        `;
+                                <div class="resultsContainer">
+                                    <div id="resumeLength">
+                                        <p><strong>Length of Resume</strong> <br>${totalWordCount} words</p>
+                                        <div class="scoring">Score: ${lengthScore}/5</div>
+                                    </div>
+                                    <div id="keywordsFound">
+                                        <p><strong>Keywords Found</strong> <br>${matchedKeywords.join(', ')}</p>
+                                        <div class="scoring">Score: ${keywordScore}/10</div>
+                                    </div>
+                                    <div id="education">
+                                        <p><strong>Education</strong> <br>${educationDisplay}</p>
+                                        <div class="scoring">Score: ${educationScore}/5</div>
+                                    </div>
+                                    <div id="experience">
+                                        <p><strong>Experience</strong> <br> ${hasExperience ? experienceDetails.join(', ') : "No Relevant Experience"}</p>
+                                        <div class="scoring">Score: ${experienceScore}/5</div>
+                                    </div>
+                                    <div id="totalScore">
+                                        <p><strong>Total Score</strong></p>
+                                        <div class="scoringTotal">${totalScore}</div>
+                                    </div>
+                                </div> 
+                                <hr>
+                            `;
                         resultsDiv.appendChild(fileResults);
                         });
                     });
