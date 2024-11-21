@@ -40,7 +40,7 @@
     </div>
     <script>
 
-//   For form
+//   Form
             const filesInput = document.getElementById('files');
             const fileNameDisplay = document.getElementById('fileName');
 
@@ -112,12 +112,12 @@
 
                             let totalScore = 0;
 
-                            // 2. Length of the Resume
+                            // Length of the Resume
                             const totalWordCount = text.split(/\s+/).filter(word => word.trim() !== '').length;
                             const lengthScore = Math.min(5, Math.floor(totalWordCount / 100)); // Max 5 points
                             totalScore += lengthScore;
 
-                            // 3. Keyword Scoring
+                            // Keyword Scoring
                             let keywordCount = 0;
                             let matchedKeywords = [];
                             criteria.keywords.forEach(keyword => {
@@ -129,13 +129,13 @@
                             const keywordScore = Math.min(10, keywordCount * 2); // Max 10 points
                             totalScore += keywordScore;
 
-                            // 4. Education Scoring
+                            // Education Scoring
                             const educationMatch = criteria.educationKeywords.find(degree => text.includes(degree));
                             const hasEducation = Boolean(educationMatch);
                             const educationScore = hasEducation ? 5 : 0;
                             totalScore += educationScore;
 
-                           // 5. Experience Scoring
+                           // Experience Scoring
                             const monthYearRegex = /(?:January|February|March|April|May|June|July|August|September|October|November|December)\s(\d{4})\s(?:-|to)\s(?:January|February|March|April|May|June|July|August|September|October|November|December)\s(\d{4})/gi;
                             const yearRangeRegex = /(\d{4})\s*(?:-|to)\s*(\d{4})/gi;
                             const yearMentionRegex = /\b(\d+)\s+years\b/gi;
