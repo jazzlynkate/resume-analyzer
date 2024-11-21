@@ -32,18 +32,18 @@ flex-direction: column;
 
 @media (max-width: 768px) {
     .uploadSection img {
-        max-width: 400px; /* Adjust max-width for tablets */
+        max-width: 400px; /* tablets */
     }
 }
 
 @media (max-width: 480px) {
     .uploadSection img {
-        max-width: 300px; /* Adjust max-width for mobile */
+        max-width: 300px; /* mobile */
     }
 }
+
  /* Upload Form */
 
- /* Container to center the upload box */
 .uploadContainer {
     display: flex;
     justify-content: center;
@@ -51,7 +51,6 @@ flex-direction: column;
     height: 50vh;
 }
 
-/* Style for the upload box */
 .uploadBox {
     background-color: white;
     border-radius: 10px;
@@ -62,7 +61,6 @@ flex-direction: column;
     text-align: center;
 }
 
-/* Text inside the upload box */
 .uploadText {
     font-size: 16px;
     color: #333;
@@ -87,12 +85,10 @@ flex-direction: column;
     transition: background-color 0.3s;
 }
 
-/* File label hover effect */
 .fileLabel:hover {
     background-color: #e0e0e0;
 }
 
-/* Display selected file name */
 #fileName {
     display: block;
     margin: 10px 0;
@@ -152,5 +148,4 @@ button:hover {
     padding: 20px;
     width: 300px;
     max-width: 100%;
-    color: #000000; 
 }
