@@ -1,19 +1,14 @@
 const express = require("express");
+const { PDFDocument } = require('pdf-lib'); 
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const pdfParse = require("pdf-parse");
 const path = require("path");
 
-const app = express();
+const app = express(); // Make sure this line is present to initialize the 'app'
 
-// Middleware
-app.use(cors());
-app.use(bodyParser.json());
+app.use(express.json({ limit: '30mb' }));
 
-// Serve static files (e.g., index.html, CSS, JS)
-app.use(express.static(path.join(__dirname, "resume-analyzer")));
-
-// PDF analysis endpoint
 app.post("/analyze", async (req, res) => {
     try {
         const { fileContent } = req.body; // Base64 encoded file content
@@ -22,53 +17,47 @@ app.post("/analyze", async (req, res) => {
             return res.status(400).send({ error: "No file content provided." });
         }
 
-        // Decode the Base64 content
+        // Decode the Base64 content and log buffer length
         const buffer = Buffer.from(fileContent, "base64");
+        console.log("Buffer length:", buffer.length);
 
-        // Extract text using pdf-parse
-        const pdfData = await pdfParse(buffer);
-        const text = pdfData.text;
+        // Load the PDF document
+        const pdfDoc = await PDFDocument.load(buffer);
 
-        // Separate Education and Experience
-        const educationSection = extractSection(text, ["education", "degree", "bachelor", "master", "phd"]);
-        const experienceSection = extractSection(text, ["experience", "role", "job", "position"]);
+        // Extract all text from the PDF
+        const pages = pdfDoc.getPages();
+        let extractedText = "";
+        pages.forEach((page) => {
+            extractedText += page.getTextContent().join("\n");
+        });
 
-        // Extract Years
-        const educationYears = extractYears(educationSection);
-        const experienceYears = extractYears(experienceSection);
+        console.log("Extracted text:", extractedText.substring(0, 100)); // Log first 100 chars
+
+        if (!extractedText.trim()) {
+            return res.status(400).send({ error: "No text found in PDF. Is this a scanned document?" });
+        }
+
+        // Split text into sections
+        const sections = splitSections(extractedText);
+
+        // Calculate scores
+        const lengthScore = calculateLengthScore(extractedText);
+        const keywordScore = calculateKeywordScore(extractedText);
+        const educationScore = calculateEducationScore(sections["Education"]);
+        const experienceScore = calculateExperienceScore(sections["Experience"]);
+
+        // Total score
+        const totalScore = lengthScore + keywordScore + educationScore + experienceScore;
 
         res.send({
-            educationYears,
-            experienceYears,
+            lengthScore,
+            keywordScore,
+            educationScore,
+            experienceScore,
+            totalScore,
         });
     } catch (error) {
-        res.status(500).send({ error: error.message });
+        console.error("Error analyzing resume:", error.message, error.stack);
+        res.status(500).send({ error: "Internal server error.", details: error.message });
     }
-});
-
-// Extract relevant sections based on keywords
-function extractSection(text, keywords) {
-    const lowerText = text.toLowerCase();
-    const relevantLines = lowerText
-        .split("\n")
-        .filter((line) => keywords.some((keyword) => line.includes(keyword)));
-    return relevantLines.join("\n");
-}
-
-// Extract years from a given section
-function extractYears(section) {
-    const yearRegex = /\b(19|20)\d{2}\b/g; // Matches years between 1900 and 2099
-    const matches = section.match(yearRegex);
-    return matches ? matches : [];
-}
-
-// Catch-all route to serve index.html for unmatched routes
-app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "resume-analyzer", "index.html"));
-});
-
-// Start server
-const PORT = 5000;
-app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
 });
