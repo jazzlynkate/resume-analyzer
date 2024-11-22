@@ -156,7 +156,8 @@
                                     hasExperience = true;
                                     const roleMatch = originalText.substring(0, match.index).match(roleRegex);
                                     const role = roleMatch ? roleMatch[1].trim() : "Role Unknown";
-                                    experienceDetails.push(`${experienceYears} years (${role}, ${match[0]})`);
+                                    experienceDetails.push(`${experienceYears} years (${role} ${match[0].replace(/,\s/g, ' ')})`);
+
                                 }
                             });
 
