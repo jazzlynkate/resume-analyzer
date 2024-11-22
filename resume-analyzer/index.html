@@ -77,7 +77,7 @@
                     "supervisor", "supervised", "supervising", "supervises",
                     "market share", "marketing", "marketer", "market research"
                 ],
-                educationKeywords: ["BS", "BA", "bachelor's", "master's", "bachelor", "masters", "doctoral", "doctorate", "phd"]
+                educationKeywords: ["bs", "bs", "bachelor's", "master's", "bachelor", "masters", "doctoral", "doctorate", "phd"]
             };
 
             Array.from(files).forEach((file, index) => {
@@ -109,6 +109,7 @@
                             // Convert text to lowercase for case-insensitive comparison
                             text = text.toLowerCase();
 
+                            console.log(text)
                             let totalScore = 0;
 
                             // Length of the Resume
@@ -133,7 +134,29 @@
                             const hasEducation = educationMatches.length > 0;
                             const educationScore = hasEducation ? 5 : 0;
 
-                            const hasEducationMentioned = text.includes("education"); // Check for the word "education"
+               
+                            let educationDisplay = "No Degree Found";
+
+                            if (hasEducation) {
+                  
+                                educationDisplay = educationMatches.map(degree => {
+                                    if (degree.toLowerCase() === "bs") {
+                                        return "Bachelor of Science";
+                                    } else if (degree.toLowerCase() === "ba") {
+                                        return "Bachelor of Arts";
+                                    } else if (degree.toLowerCase() === "bachelor" || degree.toLowerCase() === "bachelor's") {
+                                        return "Bachelor's Degree";
+                                    } else if (degree.toLowerCase() === "masters" || degree.toLowerCase() === "master's") {
+                                        return "Master's Degree";
+                                    } else if (degree.toLowerCase() === "doctoral" || degree.toLowerCase() === "doctorate" || degree.toLowerCase() === "phd") {
+                                        return "Doctorate Degree (PhD)";
+                                    } else {
+                                        return degree; 
+                                    }
+                                }).join(', ');
+                            }
+
+                            const hasEducationMentioned = text.includes("education"); 
 
 
                            // Experience Scoring
@@ -174,7 +197,7 @@
                                     hasExperience = true;
                                     const roleMatch = originalText.substring(0, match.index).match(roleRegex);
                                     const role = roleMatch ? roleMatch[1].trim() : "Role Unknown";
-                                    // Remove comma before the year if no month is included
+                    
                                     experienceDetails.push(`${experienceYears} years (${role} ${match[0]})`);
                                 }
                             });
@@ -193,7 +216,6 @@
 
                             // Display results
                             const fileResults = document.createElement('div');
-                            const educationDisplay = hasEducationMentioned ? "Degree Found: " + educationMatches.join(', ') : "No Degree Found";
                             fileResults.innerHTML = `
                                 <div class="resultsHeader">
                                     <h2>Analysis Results</h2>
@@ -223,7 +245,7 @@
                                 </div> 
                                 <hr>
                             `;
-                        resultsDiv.appendChild(fileResults);
+                            resultsDiv.appendChild(fileResults);
                         });
                     });
                 };
