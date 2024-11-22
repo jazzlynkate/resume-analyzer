@@ -27,7 +27,6 @@
             </form>
         </div>
     </div>
-    </form>
     </div>
     <div class="uploadRight">
     <img src="./images/candidate-analysis.png" alt="Analyzing Resume Illustration">
@@ -50,75 +49,69 @@
                 fileNameDisplay.textContent = fileList || 'No file chosen';
             });
 
-                    document.getElementById('form').addEventListener('submit', function (e) {
-                        e.preventDefault();
+            document.getElementById('form').addEventListener('submit', function (e) {
+    e.preventDefault();
 
-                        const fileInput = document.getElementById('files');
-                        const files = fileInput.files;
+    const fileInput = document.getElementById('files');
+    const files = fileInput.files;
 
-                        if (!files.length) {
-                            alert('Please upload at least one resume.');
-                            return;
-                        }
-
-                        if (files.length > 5) {
-                            alert('You can only upload up to 5 resumes at once.');
-                            return;
-                        }
-                        //
-            const resultsDiv = document.getElementById('results');
-            resultsDiv.innerHTML = ''; // Clear previous results
-
-            const criteria = {
-                keywords: [
-                    "manage", "manages", "managing", "managed", "manager",
-                    "graphic design", "design", "visual",
-                    "mentor", "mentored", "mentors", "mentoring",
-                    "supervisor", "supervised", "supervising", "supervises",
-                    "market share", "marketing", "marketer", "market research"
-                ],
-                educationKeywords: ["bachelor's", "master's", "bachelor", "masters", "doctoral", "doctorate", "phd"]
-            };
-
-            Array.from(files).forEach((file, index) => {
-                const fileReader = new FileReader();
-
-                fileReader.onload = async function () {
-    const base64File = btoa(
-        new Uint8Array(fileReader.result)
-            .reduce((data, byte) => data + String.fromCharCode(byte), "")
-    );
-
-    try {
-        const response = await fetch("http://localhost:5000/analyze", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ fileContent: base64File }),
-        });
-
-        const result = await response.json();
-
-        if (response.ok) {
-            const { educationYears, experienceYears } = result;
-
-            resultsDiv.innerHTML = `
-                <div>
-                    <h3>Education Years:</h3>
-                    <p>${educationYears.join(", ") || "No Education Years Found"}</p>
-                    <h3>Experience Years:</h3>
-                    <p>${experienceYears.join(", ") || "No Experience Years Found"}</p>
-                </div>
-            `;
-        } else {
-            alert(result.error || "An error occurred while processing the PDF.");
-        }
-    } catch (error) {
-        alert("Unable to connect to the backend server.");
-        console.error(error);
+    if (!files.length) {
+        alert('Please upload at least one resume.');
+        return;
     }
-};
+
+    if (files.length > 5) {
+        alert('You can only upload up to 5 resumes at once.');
+        return;
+    }
+
+    const resultsDiv = document.getElementById('results');
+    resultsDiv.innerHTML = ''; // Clear previous results
+
+    Array.from(files).forEach((file, index) => {
+        const fileReader = new FileReader();
+
+        fileReader.onload = async function () {
+            const base64File = btoa(
+                new Uint8Array(fileReader.result)
+                    .reduce((data, byte) => data + String.fromCharCode(byte), "")
+            );
+
+            try {
+                const response = await fetch("http://localhost:5000/analyze", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ fileContent: base64File }),
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    const { educationYears, experienceYears } = result;
+
+                    resultsDiv.innerHTML = `
+                        <div>
+                            <h3>Education Years:</h3>
+                            <p>${educationYears.join(", ") || "No Education Years Found"}</p>
+                            <h3>Experience Years:</h3>
+                            <p>${experienceYears.join(", ") || "No Experience Years Found"}</p>
+                        </div>
+                    `;
+                } else {
+                    alert(result.error || "An error occurred while processing the PDF.");
+                }
+            } catch (error) {
+                alert("Unable to connect to the backend server.");
+                console.error(error);
+            }
+        };
+
+        fileReader.readAsArrayBuffer(file);
+    });
+});
+
 
 
                 // fileReader.onload = function () {
@@ -259,8 +252,7 @@
                                 <hr>
                             `;
                         resultsDiv.appendChild(fileResults);
-                        });
-                    });
+                   
         //         };
 
         //         fileReader.readAsArrayBuffer(file);
