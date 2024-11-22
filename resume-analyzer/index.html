@@ -39,7 +39,7 @@
     </div>
     <script>
 
-//   Form
+            //   Form
             const filesInput = document.getElementById('files');
             const fileNameDisplay = document.getElementById('fileName');
 
@@ -67,7 +67,7 @@
                         }
                         //
             const resultsDiv = document.getElementById('results');
-            resultsDiv.innerHTML = ''; // Clear previous results
+            resultsDiv.innerHTML = '';
 
             const criteria = {
                 keywords: [
@@ -114,7 +114,7 @@
 
                             // Length of the Resume
                             const totalWordCount = text.split(/\s+/).filter(word => word.trim() !== '').length;
-                            const lengthScore = Math.min(5, Math.floor(totalWordCount / 100)); // Max 5 points
+                            const lengthScore = Math.min(5, Math.floor(totalWordCount / 100));
                             totalScore += lengthScore;
 
                             // Keyword Scoring
@@ -126,7 +126,7 @@
                                     matchedKeywords.push(keyword);
                                 }
                             });
-                            const keywordScore = Math.min(10, keywordCount * 2); // Max 10 points
+                            const keywordScore = Math.min(10, keywordCount * 2);
                             totalScore += keywordScore;
 
                             // Education Scoring
@@ -152,8 +152,6 @@
                                 }).join(', ');
                             }
 
-                            const hasEducationMentioned = text.includes("education"); 
-
 
                            // Experience Scoring
                             const monthYearRegex = /(?:January|February|March|April|May|June|July|August|September|October|November|December)\s(\d{4})\s(?:-|to)\s(?:January|February|March|April|May|June|July|August|September|October|November|December)\s(\d{4})/gi;
@@ -178,8 +176,7 @@
                                     hasExperience = true;
                                     const roleMatch = originalText.substring(0, match.index).match(roleRegex);
                                     const role = roleMatch ? roleMatch[1].trim() : "Role Unknown";
-                                    experienceDetails.push(`${experienceYears} years (${role} ${match[0].replace(/,\s/g, ' ')})`);
-
+                                    experienceDetails.push(`${experienceYears} years (${role} ${match[0].replace(/,\s/g, '')})`);
                                 }
                             });
 
