@@ -140,11 +140,7 @@
                             if (hasEducation) {
                   
                                 educationDisplay = educationMatches.map(degree => {
-                                    if (degree.toLowerCase() === "bs") {
-                                        return "Bachelor of Science";
-                                    } else if (degree.toLowerCase() === "ba") {
-                                        return "Bachelor of Arts";
-                                    } else if (degree.toLowerCase() === "bachelor" || degree.toLowerCase() === "bachelor's") {
+                                     if (degree.toLowerCase() === "bachelor" || degree.toLowerCase() === "bachelor's" || degree.toLowerCase() === "bs" || degree.toLowerCase() === "ba") {
                                         return "Bachelor's Degree";
                                     } else if (degree.toLowerCase() === "masters" || degree.toLowerCase() === "master's") {
                                         return "Master's Degree";
@@ -163,7 +159,7 @@
                             const monthYearRegex = /(?:January|February|March|April|May|June|July|August|September|October|November|December)\s(\d{4})\s(?:-|to)\s(?:January|February|March|April|May|June|July|August|September|October|November|December)\s(\d{4})/gi;
                             const yearRangeRegex = /(\d{4})\s*(?:-|to)\s*(\d{4})/gi;
                             const yearMentionRegex = /\b(\d+)\s+years\b/gi;
-                            const roleRegex = /(?:\n|\r|\s)?(.*?)(?:\s(?:since|until|\d{4}|\d{2}-\d{2}|to))?/i;  // Matches job title
+                            const roleRegex = /(?:\n|\r|\s)?(.*?)(?:\s(?:since|until|\d{4}|\d{2}-\d{2}|to))?/i; 
 
                             const dateMatches = [...originalText.matchAll(monthYearRegex)];
                             const yearRangeMatches = [...originalText.matchAll(yearRangeRegex)];
