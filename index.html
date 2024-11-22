@@ -83,110 +83,148 @@
             Array.from(files).forEach((file, index) => {
                 const fileReader = new FileReader();
 
-                fileReader.onload = function () {
-                    const typedArray = new Uint8Array(fileReader.result);
+                fileReader.onload = async function () {
+    const base64File = btoa(
+        new Uint8Array(fileReader.result)
+            .reduce((data, byte) => data + String.fromCharCode(byte), "")
+    );
 
-                    pdfjsLib.getDocument(typedArray).promise.then(function (pdf) {
-                        let text = '';
+    try {
+        const response = await fetch("http://localhost:5000/analyze", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ fileContent: base64File }),
+        });
 
-                        const pagePromises = [];
-                        for (let i = 1; i <= pdf.numPages; i++) {
-                            pagePromises.push(
-                                pdf.getPage(i).then(function (page) {
-                                    return page.getTextContent().then(function (textContent) {
-                                        textContent.items.forEach((item) => {
-                                            text += item.str + ' ';
-                                        });
-                                    });
-                                })
-                            );
-                        }
+        const result = await response.json();
 
-                        Promise.all(pagePromises).then(() => {
-                            // Maintain original capitalization
-                            const originalText = text;
+        if (response.ok) {
+            const { educationYears, experienceYears } = result;
 
-                            // Convert text to lowercase for case-insensitive comparison
-                            text = text.toLowerCase();
+            resultsDiv.innerHTML = `
+                <div>
+                    <h3>Education Years:</h3>
+                    <p>${educationYears.join(", ") || "No Education Years Found"}</p>
+                    <h3>Experience Years:</h3>
+                    <p>${experienceYears.join(", ") || "No Experience Years Found"}</p>
+                </div>
+            `;
+        } else {
+            alert(result.error || "An error occurred while processing the PDF.");
+        }
+    } catch (error) {
+        alert("Unable to connect to the backend server.");
+        console.error(error);
+    }
+};
 
-                            let totalScore = 0;
 
-                            // Length of the Resume
-                            const totalWordCount = text.split(/\s+/).filter(word => word.trim() !== '').length;
-                            const lengthScore = Math.min(5, Math.floor(totalWordCount / 100)); // Max 5 points
-                            totalScore += lengthScore;
+                // fileReader.onload = function () {
+                //     const typedArray = new Uint8Array(fileReader.result);
 
-                            // Keyword Scoring
-                            let keywordCount = 0;
-                            let matchedKeywords = [];
-                            criteria.keywords.forEach(keyword => {
-                                if (text.includes(keyword)) {
-                                    keywordCount++;
-                                    matchedKeywords.push(keyword);
-                                }
-                            });
-                            const keywordScore = Math.min(10, keywordCount * 2); // Max 10 points
-                            totalScore += keywordScore;
+                //     pdfjsLib.getDocument(typedArray).promise.then(function (pdf) {
+                //         let text = '';
 
-                            // Education Scoring
-                            const educationMatches = criteria.educationKeywords.filter(degree => text.includes(degree));
-                            const hasEducation = educationMatches.length > 0;
-                            const educationScore = hasEducation ? 5 : 0;
+                //         const pagePromises = [];
+                //         for (let i = 1; i <= pdf.numPages; i++) {
+                //             pagePromises.push(
+                //                 pdf.getPage(i).then(function (page) {
+                //                     return page.getTextContent().then(function (textContent) {
+                //                         textContent.items.forEach((item) => {
+                //                             text += item.str + ' ';
+                //                         });
+                //                     });
+                //                 })
+                //             );
+                //         }
 
-                           // Experience Scoring
-                            const monthYearRegex = /(?:January|February|March|April|May|June|July|August|September|October|November|December)\s(\d{4})\s(?:-|to)\s(?:January|February|March|April|May|June|July|August|September|October|November|December)\s(\d{4})/gi;
-                            const yearRangeRegex = /(\d{4})\s*(?:-|to)\s*(\d{4})/gi;
-                            const yearMentionRegex = /\b(\d+)\s+years\b/gi;
-                            const roleRegex = /(?:\n|\r|\s)?(.*?)(?:\s(?:since|until|\d{4}|\d{2}-\d{2}|to))?/i;  // Matches job title
+                //         Promise.all(pagePromises).then(() => {
+                //             // Maintain original capitalization
+                //             const originalText = text;
 
-                            const dateMatches = [...originalText.matchAll(monthYearRegex)];
-                            const yearRangeMatches = [...originalText.matchAll(yearRangeRegex)];
-                            const yearMentions = [...text.matchAll(yearMentionRegex)];
+                //             // Convert text to lowercase for case-insensitive comparison
+                //             text = text.toLowerCase();
 
-                            let hasExperience = false;
-                            let experienceDetails = [];
+                //             let totalScore = 0;
 
-                            // Parse month-year ranges
-                            dateMatches.forEach(match => {
-                                const startYear = parseInt(match[1]);
-                                const endYear = parseInt(match[2]);
-                                const experienceYears = endYear - startYear;
+                //             // Length of the Resume
+                //             const totalWordCount = text.split(/\s+/).filter(word => word.trim() !== '').length;
+                //             const lengthScore = Math.min(5, Math.floor(totalWordCount / 100)); // Max 5 points
+                //             totalScore += lengthScore;
 
-                                if (experienceYears >= 2) {
-                                    hasExperience = true;
-                                    const roleMatch = originalText.substring(0, match.index).match(roleRegex);
-                                    const role = roleMatch ? roleMatch[1].trim() : "Role Unknown";
-                                    experienceDetails.push(`${experienceYears} years (${role} ${match[0].replace(/,\s/g, ' ')})`);
+                //             // Keyword Scoring
+                //             let keywordCount = 0;
+                //             let matchedKeywords = [];
+                //             criteria.keywords.forEach(keyword => {
+                //                 if (text.includes(keyword)) {
+                //                     keywordCount++;
+                //                     matchedKeywords.push(keyword);
+                //                 }
+                //             });
+                //             const keywordScore = Math.min(10, keywordCount * 2); // Max 10 points
+                //             totalScore += keywordScore;
 
-                                }
-                            });
+                //             // Education Scoring
+                //             const educationMatches = criteria.educationKeywords.filter(degree => text.includes(degree));
+                //             const hasEducation = educationMatches.length > 0;
+                //             const educationScore = hasEducation ? 5 : 0;
 
-                            // Parse year-only ranges
-                            yearRangeMatches.forEach(match => {
-                                const startYear = parseInt(match[1]);
-                                const endYear = parseInt(match[2]);
-                                const experienceYears = endYear - startYear;
+                //            // Experience Scoring
+                //             const monthYearRegex = /(?:January|February|March|April|May|June|July|August|September|October|November|December)\s(\d{4})\s(?:-|to)\s(?:January|February|March|April|May|June|July|August|September|October|November|December)\s(\d{4})/gi;
+                //             const yearRangeRegex = /(\d{4})\s*(?:-|to)\s*(\d{4})/gi;
+                //             const yearMentionRegex = /\b(\d+)\s+years\b/gi;
+                //             const roleRegex = /(?:\n|\r|\s)?(.*?)(?:\s(?:since|until|\d{4}|\d{2}-\d{2}|to))?/i;  // Matches job title
 
-                                if (experienceYears >= 2) {
-                                    hasExperience = true;
-                                    const roleMatch = originalText.substring(0, match.index).match(roleRegex);
-                                    const role = roleMatch ? roleMatch[1].trim() : "Role Unknown";
-                                    // Remove comma before the year if no month is included
-                                    experienceDetails.push(`${experienceYears} years (${role} ${match[0]})`);
-                                }
-                            });
+                //             const dateMatches = [...originalText.matchAll(monthYearRegex)];
+                //             const yearRangeMatches = [...originalText.matchAll(yearRangeRegex)];
+                //             const yearMentions = [...text.matchAll(yearMentionRegex)];
 
-                            // Parse year mentions
-                            yearMentions.forEach(match => {
-                                const years = parseInt(match[1]);
-                                if (years >= 2) {
-                                    hasExperience = true;
-                                    experienceDetails.push(`${years} years mentioned`);
-                                }
-                            });
+                //             let hasExperience = false;
+                //             let experienceDetails = [];
 
-                            const experienceScore = hasExperience ? 5 : 0;
-                            totalScore += experienceScore;
+                //             // Parse month-year ranges
+                //             dateMatches.forEach(match => {
+                //                 const startYear = parseInt(match[1]);
+                //                 const endYear = parseInt(match[2]);
+                //                 const experienceYears = endYear - startYear;
+
+                //                 if (experienceYears >= 2) {
+                //                     hasExperience = true;
+                //                     const roleMatch = originalText.substring(0, match.index).match(roleRegex);
+                //                     const role = roleMatch ? roleMatch[1].trim() : "Role Unknown";
+                //                     experienceDetails.push(`${experienceYears} years (${role} ${match[0].replace(/,\s/g, ' ')})`);
+
+                //                 }
+                //             });
+
+                //             // Parse year-only ranges
+                //             yearRangeMatches.forEach(match => {
+                //                 const startYear = parseInt(match[1]);
+                //                 const endYear = parseInt(match[2]);
+                //                 const experienceYears = endYear - startYear;
+
+                //                 if (experienceYears >= 2) {
+                //                     hasExperience = true;
+                //                     const roleMatch = originalText.substring(0, match.index).match(roleRegex);
+                //                     const role = roleMatch ? roleMatch[1].trim() : "Role Unknown";
+                //                     // Remove comma before the year if no month is included
+                //                     experienceDetails.push(`${experienceYears} years (${role} ${match[0]})`);
+                //                 }
+                //             });
+
+                //             // Parse year mentions
+                //             yearMentions.forEach(match => {
+                //                 const years = parseInt(match[1]);
+                //                 if (years >= 2) {
+                //                     hasExperience = true;
+                //                     experienceDetails.push(`${years} years mentioned`);
+                //                 }
+                //             });
+
+                //             const experienceScore = hasExperience ? 5 : 0;
+                //             totalScore += experienceScore;
 
                             // Display results
                             const fileResults = document.createElement('div');
@@ -223,11 +261,11 @@
                         resultsDiv.appendChild(fileResults);
                         });
                     });
-                };
+        //         };
 
-                fileReader.readAsArrayBuffer(file);
-            });
-        });
+        //         fileReader.readAsArrayBuffer(file);
+        //     });
+        // });
     </script>
 </body>
 </html>
